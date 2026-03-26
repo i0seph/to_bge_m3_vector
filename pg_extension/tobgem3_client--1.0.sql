@@ -1,0 +1,4 @@
+CREATE OR REPLACE FUNCTION tobgem3vector(text)
+RETURNS vector
+AS 'MODULE_PATHNAME', 'tobgem3vector_c'
+LANGUAGE C STRICT;
