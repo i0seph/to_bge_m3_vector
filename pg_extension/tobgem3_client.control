@@ -1,0 +1,4 @@
+comment = 'UDS client for BGE-M3 embedding server'
+default_version = '1.0'
+module_pathname = '$libdir/tobgem3_client'
+relocatable = true
