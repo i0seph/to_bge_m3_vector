@@ -19,6 +19,37 @@ PG_FUNCTION_INFO_V1(tobgem3vector_c);
 
 #define SOCKET_PATH "/tmp/bge_m3_model.sock"
 
+char *escape_json(const char *src) {
+    if (src == NULL) return NULL;
+
+    int len = strlen(src);
+    // 모든 문자가 이스케이프 대상일 경우를 대비해 넉넉히 할당
+    char *dest = palloc(len * 2 + 1);
+    char *p = dest;
+
+    while (*src) {
+        switch (*src) {
+            case '\\': *p++ = '\\'; *p++ = '\\'; break;
+            case '"':  *p++ = '\\'; *p++ = '"';  break;
+            case '\n': *p++ = '\\'; *p++ = 'n';  break;
+            case '\r': *p++ = '\\'; *p++ = 'r';  break;
+            case '\t': *p++ = '\\'; *p++ = 't';  break;
+            default:
+                // ASCII 제어 문자(0x00~0x1F) 처리 (선택사항이나 권장)
+                if ((unsigned char)*src < 0x20) {
+                    // 무시하거나 공백으로 대체
+                    *p++ = ' ';
+                } else {
+                    *p++ = *src;
+                }
+                break;
+        }
+        src++;
+    }
+    *p = '\0';
+    return dest;
+}
+
 Datum
 tobgem3vector_c(PG_FUNCTION_ARGS)
 {
@@ -26,8 +57,8 @@ tobgem3vector_c(PG_FUNCTION_ARGS)
     char *query = text_to_cstring(input_text);
     int sock;
     struct sockaddr_un server_addr;
-
-    char *payload = psprintf("{\"query\": \"%s\"}", query);
+    char *escaped_query = escape_json(query); // 이스케이프 처리 추가
+    char *payload = psprintf("{\"query\": \"%s\"}", escaped_query);
     uint32_t payload_len = (uint32_t)strlen(payload);
     uint32_t net_len = htonl(payload_len);
 
