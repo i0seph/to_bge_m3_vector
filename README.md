@@ -1,6 +1,10 @@
 # to_bge_m3_vector
 Embedding extension implemented using the BAAI/bge-m3 model for PostgreSQL
 
+# 전체 구성
+
+<img src="tobgem3-diagram.svg" width="800" height="600">
+
 # 사용법
 1. bge-m3 임베딩 처리를 할 서버 실행 (server 폴더에 있음)
 2. pg_extension 폴더에 있는 확장 모듈 빌드 및 설치
